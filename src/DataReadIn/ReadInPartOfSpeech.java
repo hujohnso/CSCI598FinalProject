@@ -42,9 +42,6 @@ public class ReadInPartOfSpeech extends ReadData {
 			temp = temp.replace(")", "");
 			String [] tagAndWord = temp.split(" ");
 			if(!isPunctuation(tagAndWord[1])){
-				if(tagAndWord[1].equals("enticing")){
-					System.out.println("The line is: " + line);
-				}
 				String filteredWord = filterPunctutaionOutOfWords(tagAndWord[1]);
 				if(filteredWord.length() > 0){
 					try{

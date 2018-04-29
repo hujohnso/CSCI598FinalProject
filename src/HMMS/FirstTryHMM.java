@@ -26,8 +26,9 @@ public class FirstTryHMM extends HMM {
 	 * 
 	 * 
 	 * */
-	FirstTryHMM(ArrayList<Sentence> sentences, double trainingDataPercentage){
+	public FirstTryHMM(ArrayList<Sentence> sentences, double trainingDataPercentage){
 		super(sentences,trainingDataPercentage);
+		
 	}
 	/*This table represents the probabilities of transitions between all of the
 	 * hidden states.  In this case the hidden states are the emmood tags.
@@ -36,7 +37,6 @@ public class FirstTryHMM extends HMM {
 	protected void makeTransitionProbabilitiesTable() {
 		ArrayList<EmotionOfSentenceTag> order = new ArrayList<>();
 		Map<EmotionOfSentenceTag,Integer> emmoodTagsCounter = new HashMap<>();
-		ArrayList<Integer> emmoodTagCounts = new ArrayList<>();
 		emmoodTagsCounter = clean(emmoodTagsCounter);
 		for(EmotionOfSentenceTag e: order){
 			for(int i = 1; i < trainingWords.size(); ++i){
@@ -66,10 +66,38 @@ public class FirstTryHMM extends HMM {
 		}
 		return map;
 	}
-
+	/*This table coresponds to each observations likelihood of being in a
+	 * particular hidden state so like for every single word what is the probability
+	 * that is the P(a given word|the emmood tag) */
 	@Override
 	protected void makeObservationLikelihoodTable() {
-
+		for(Word w: trainingWords){
+			//Override equals method but I am not sure if that helps with
+			//This check.  Definiatly debug this biz;
+			if(observationLikelihoodTable.contains(w.getWord())){
+				incrementPresentObservationLikelihoodTable(w.getWord(),w.getEmoodTag());
+			}
+			else{
+				ObservationLikelihoodTableEntry olt = new ObservationLikelihoodTableEntry(order,w.getWord());
+				olt.incrementEmmoodCount(w.getEmoodTag());
+				observationLikelihoodTable.add(olt);
+			}
+		}
 	}
+	private void incrementPresentObservationLikelihoodTable(String word,EmotionOfSentenceTag emmoodTag){
+		for(ObservationLikelihoodTableEntry x: observationLikelihoodTable){
+			if(x.equals(word)){
+				x.incrementEmmoodCount(emmoodTag);
+			}
+		}
+	}
+	@Override
+	protected ArrayList<Word> tagTestingSet() {
+		viterbi = new Viterbi(testingWords,observationLikelihoodTable,
+				transitionProbabilitiesTable, initialStateProbabilities, order);
+		
+		return viterbi.getTaggedObservations();
+	}
+	
 
 }

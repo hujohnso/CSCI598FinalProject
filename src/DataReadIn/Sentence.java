@@ -14,9 +14,6 @@ public class Sentence {
 	private ArrayList<Word> words;
 	
 	Sentence(String fullSentenceEntry, String story){
-		if(fullSentenceEntry.contains("cherry")){
-			System.out.println("The full sentence Entry is: " + fullSentenceEntry);
-		}
 		this.fullSentenceEntry = fullSentenceEntry;
 		this.story = story;
 		processFullSentenceEntry(preprocessing(this.fullSentenceEntry));

@@ -16,7 +16,7 @@ public class Word {
 	public void setEmmoodTag(EmotionOfSentenceTag tag) {
 		this.emmoodTag = tag;
 	}
-	Word(String word){
+	public Word(String word){
 		this.word = word;
 	}
 	public String getWord() {
