@@ -35,13 +35,12 @@ public class FirstTryHMM extends HMM {
 	 * the rows and columns are both emmood tags.*/
 	@Override
 	protected void makeTransitionProbabilitiesTable() {
-		ArrayList<EmotionOfSentenceTag> order = new ArrayList<>();
 		Map<EmotionOfSentenceTag,Integer> emmoodTagsCounter = new HashMap<>();
 		emmoodTagsCounter = clean(emmoodTagsCounter);
 		for(EmotionOfSentenceTag e: order){
 			for(int i = 1; i < trainingWords.size(); ++i){
 				if(trainingWords.get(i).getEmoodTag().equals(e)){
-					int count = emmoodTagsCounter.get(trainingWords.get(i -1));
+					int count = emmoodTagsCounter.get(trainingWords.get(i -1).getEmoodTag());
 					emmoodTagsCounter.put(trainingWords.get(i - 1).getEmoodTag(), count + 1);
 				}
 			}
@@ -88,6 +87,9 @@ public class FirstTryHMM extends HMM {
 				olt.incrementEmmoodCount(w.getEmoodTag());
 				observationLikelihoodTable.add(olt);
 			}
+		}
+		for(ObservationLikelihoodTableEntry x: observationLikelihoodTable){
+			x.makeEmmoodProbabilities();
 		}
 	}
 	private void incrementPresentObservationLikelihoodTable(String word,EmotionOfSentenceTag emmoodTag){

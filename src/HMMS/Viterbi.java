@@ -58,7 +58,12 @@ public class Viterbi {
 		ArrayList<Double> viterbiValues = new ArrayList<Double>();
 		Map<EmotionOfSentenceTag, Double> likelihoods = findObservationLikelihoodMap(word);
 		newViterbiEntry.lastChoice = order.get(indexOfLastHighestVertbi);
+		System.out.println("The current word is: " + word.getWord());
 		for(EmotionOfSentenceTag e: order){
+			System.out.println("The size is: " + viterbi.size());
+			System.out.println("The last highest virtbi value is: " + viterbi.get(viterbi.size() - 1).viterbiValues.get(indexOfLastHighestVertbi) );
+			System.out.println("The likelihoods are " + likelihoods.get(e));
+			System.out.println("The transition probability is " + transitionProbabilitiesTable.get(indexOfLastHighestVertbi).get(e.tagNumber));
 			viterbiValues.add(viterbi.get(viterbi.size() - 1).viterbiValues.get(indexOfLastHighestVertbi) * likelihoods.get(e) * transitionProbabilitiesTable.get(indexOfLastHighestVertbi).get(e.tagNumber));
 		}
 		newViterbiEntry.viterbiValues = viterbiValues;
@@ -85,7 +90,7 @@ public class Viterbi {
 				likelihoods = o.getEmmoodProbabilities();
 			}
 		}
-		if(likelihoods == null){
+		if(likelihoods.size() == 0){
 			System.out.println("We found a word we don't know :(");
 			return getEqualLikelihoodTable();
 		}
@@ -101,12 +106,15 @@ public class Viterbi {
 	}
 	public int getMostProbableHiddenState(ArrayList<Double> numbs){
 		double highestDouble = 0;
-		int indexOfHighestDouble = 0;
+		int indexOfHighestDouble = -1;
 		for(int i = 0; i < numbs.size(); ++i){
 			if(numbs.get(i) > highestDouble){
 				indexOfHighestDouble = i;
 				highestDouble = numbs.get(i);
 			}
+		}
+		if(indexOfHighestDouble == -1){
+			System.out.println("This one is WRONG!");
 		}
 		return indexOfHighestDouble;
 	}
