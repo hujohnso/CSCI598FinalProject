@@ -30,6 +30,7 @@ public class ObservationLikelihoodTableEntry {
 	ObservationLikelihoodTableEntry(ArrayList<EmotionOfSentenceTag> order, String word){
 		emmoodCounts = new HashMap<>();
 		emmoodProbabilities = new HashMap<>();
+		this.word = word;
 		init(order);
 	}
 	public void init(ArrayList<EmotionOfSentenceTag> order){

@@ -71,9 +71,15 @@ public class FirstTryHMM extends HMM {
 	 * that is the P(a given word|the emmood tag) */
 	@Override
 	protected void makeObservationLikelihoodTable() {
+		System.out.println("The size of training words is: " + trainingWords.size());
+		int i = 0;
 		for(Word w: trainingWords){
 			//Override equals method but I am not sure if that helps with
 			//This check.  Definiatly debug this biz;
+			if(i % 2000 == 0){
+				System.out.println("We are " + ((double) i / (double) trainingWords.size()) * 100 + "% done");
+			}
+			i++;
 			if(observationLikelihoodTable.contains(w.getWord())){
 				incrementPresentObservationLikelihoodTable(w.getWord(),w.getEmoodTag());
 			}

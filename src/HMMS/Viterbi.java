@@ -25,6 +25,7 @@ public class Viterbi {
 		this.observationLikelihoodTable = observationLikelihoodTable;
 		this.transitionProbabilitiesTable = transitionProbabilitiesTable;
 		this.initialStateProbabilities = initialStateProbabilities;
+		this.order = order;
 		viterbi = new ArrayList<>();
 		performViterbi();
 		taggedObservations = traceBackStep();
@@ -58,7 +59,7 @@ public class Viterbi {
 		Map<EmotionOfSentenceTag, Double> likelihoods = findObservationLikelihoodMap(word);
 		newViterbiEntry.lastChoice = order.get(indexOfLastHighestVertbi);
 		for(EmotionOfSentenceTag e: order){
-			viterbiValues.add(viterbiValues.get(indexOfLastHighestVertbi) * likelihoods.get(e) * transitionProbabilitiesTable.get(indexOfLastHighestVertbi).get(e.tagNumber));
+			viterbiValues.add(viterbi.get(viterbi.size() - 1).viterbiValues.get(indexOfLastHighestVertbi) * likelihoods.get(e) * transitionProbabilitiesTable.get(indexOfLastHighestVertbi).get(e.tagNumber));
 		}
 		newViterbiEntry.viterbiValues = viterbiValues;
 		viterbi.add(newViterbiEntry);
@@ -84,7 +85,19 @@ public class Viterbi {
 				likelihoods = o.getEmmoodProbabilities();
 			}
 		}
+		if(likelihoods == null){
+			System.out.println("We found a word we don't know :(");
+			return getEqualLikelihoodTable();
+		}
+		System.out.println("We found a word we know!");
 		return likelihoods;
+	}
+	public Map<EmotionOfSentenceTag, Double> getEqualLikelihoodTable(){
+		Map<EmotionOfSentenceTag, Double> equal = new HashMap<>();
+		for(EmotionOfSentenceTag e: order){
+			equal.put(e, 1.0 / (double)order.size());
+		}
+		return equal;
 	}
 	public int getMostProbableHiddenState(ArrayList<Double> numbs){
 		double highestDouble = 0;
