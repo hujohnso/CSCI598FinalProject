@@ -13,15 +13,13 @@ import DataReadIn.Word;
 
 public abstract class HMM {
 	protected ArrayList<Sentence> trainingDataSentences;
-	protected ArrayList<Word> trainingWords;
 	protected ArrayList<Sentence> testingDataSentences;
-	protected ArrayList<Word> testingWords;
 	protected ArrayList<EmotionOfSentenceTag> order;
 	protected ArrayList<ArrayList<Double>> transitionProbabilitiesTable;
 	protected ArrayList<ObservationLikelihoodTableEntry> observationLikelihoodTable;
 	protected Map<EmotionOfSentenceTag,Integer> initCounts;
 	protected Map<EmotionOfSentenceTag,Double> initialStateProbabilities;
-	
+
 	protected HMM_Statistics stats;
 	protected Viterbi viterbi;
 	HMM(ArrayList<Sentence> sentences, double trainingDataPercentage){
@@ -29,7 +27,6 @@ public abstract class HMM {
 		System.out.println("Starting to fill test and training data...");
 		fillTestAndTrainingData(sentences,trainingDataPercentage);
 		System.out.println("Starting fillWordsArrays...");
-		fillWordsArrays();
 		System.out.println("Making initial probabilities map...");
 		makeInitialProbabilitiesMap();
 		System.out.println("Making transition probabilities map...");
@@ -41,8 +38,6 @@ public abstract class HMM {
 	public void init(){
 		trainingDataSentences = new ArrayList<>();
 		testingDataSentences = new ArrayList<>();
-		trainingWords = new ArrayList<>();
-		testingWords = new ArrayList<>();
 		stats = new HMM_Statistics();
 		initCounts = new HashMap<>();
 		transitionProbabilitiesTable = new ArrayList<>();
@@ -50,7 +45,7 @@ public abstract class HMM {
 		initialStateProbabilities = new HashMap<>();
 		order = new ArrayList<>();
 		initOrderOfSentenceArray();
-		
+
 	}
 	public void fillTestAndTrainingData(ArrayList<Sentence> sentences, double trainingDataPercentage){
 		int numberOfTrainingSentences = (int) (sentences.size() * trainingDataPercentage);
@@ -64,19 +59,6 @@ public abstract class HMM {
 				testingDataSentences.add(sentences.get(i));
 			}
 		}
-	}
-	public void fillWordsArrays(){
-		for(Sentence s: trainingDataSentences){
-			for(Word w: s.getWords()){
-				trainingWords.add(w);
-			}
-		}
-		for(Sentence s: testingDataSentences){
-			for(Word w: s.getWords()){
-				testingWords.add(w);
-			}
-		}
-
 	}
 	//This is purely to preserve order.  Because I don't know what kind of 
 	//Map iterator vudo maps do.
@@ -95,9 +77,11 @@ public abstract class HMM {
 	//Initial counts for the transition from the start hidden state
 	public void initialCounts(){
 		initInitCounts();
-		for(Word w: trainingWords){
-			int count = initCounts.get(w.getEmoodTag());
-			initCounts.put(w.getEmoodTag(), count + 1);
+		for(Sentence s: trainingDataSentences){
+			for(Word w: s.getWords()){
+				int count = initCounts.get(w.getEmoodTag());
+				initCounts.put(w.getEmoodTag(), count + 1);
+			}
 		}
 	}
 	public void makeInitialProbabilitiesMap(){
@@ -110,7 +94,7 @@ public abstract class HMM {
 			initialStateProbabilities.put(x,(double)initCounts.get(x) / (double)totalCount);
 		}
 	}
-	
+
 	public void initInitCounts(){
 		for(EmotionOfSentenceTag e: order){
 			initCounts.put(e, 0);
@@ -118,15 +102,20 @@ public abstract class HMM {
 	}
 	protected abstract void makeTransitionProbabilitiesTable();
 	protected abstract void makeObservationLikelihoodTable();
-	protected abstract ArrayList<Word> tagTestingSet();
+	protected abstract ArrayList<ArrayList<Word>> tagTestingSet();
 	public double findCorrectPercentage(){
-		ArrayList<Word> hmmTaggedWords = tagTestingSet();
+		ArrayList<ArrayList<Word>> hmmTaggedWords = tagTestingSet();
 		int totalCorrectWords = 0;
-		for(int i = 0; i < testingWords.size();++i){
-			if(testingWords.get(i).getEmoodTag().equals(hmmTaggedWords.get(i).getEmoodTag())){
-				totalCorrectWords++;
+		int totalWords = 0;
+		for(int i = 0; i < testingDataSentences.size(); i++){
+			ArrayList<Word> taggedWords = hmmTaggedWords.get(i);
+			for(int j = 0; j < testingDataSentences.get(i).getWords().size(); ++j){
+				if(taggedWords.get(j).getEmoodTag().equals(testingDataSentences.get(i).getWords().get(j).getEmoodTag())){
+					totalCorrectWords++;
+				}
+				totalWords++;
 			}
 		}
-		return (double) totalCorrectWords / (double) testingWords.size();
+		return (double) totalCorrectWords / (double) totalWords;
 	}
 }

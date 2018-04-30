@@ -41,6 +41,18 @@ public class MoodData {
 		catch(IOException e){
 			System.out.println(e.getMessage());
 		}
+		filterSentences();
+	}
+	private void filterSentences(){
+		ArrayList<Sentence> sentencesToRemove = new ArrayList<>();
+		for(int i = 0; i < sentences.size(); ++i){
+			if(sentences.get(i).getWords().size() == 0){
+				sentencesToRemove.add(sentences.get(i));
+			}
+		}
+		for(Sentence s: sentencesToRemove){
+			sentences.remove(s);
+		}
 	}
 	public void printNumMissmatchedPartsOfSpeech(){
 		int i = 0;

@@ -8,47 +8,58 @@ import java.util.HashMap;
 import java.util.Map;
 
 import DataReadIn.EmotionOfSentenceTag;
+import DataReadIn.Sentence;
 import DataReadIn.Word;
 
 public class Viterbi {
-	ArrayList<Word> observations;
+//	ArrayList<Word> observations;
 	ArrayList<ObservationLikelihoodTableEntry> observationLikelihoodTable;
 	ArrayList<ArrayList<Double>> transitionProbabilitiesTable;
 	Map<EmotionOfSentenceTag,Double> initialStateProbabilities;
 	ArrayList<EmotionOfSentenceTag> order;
 	ArrayList<ViterbiEntry>  viterbi;
 	ArrayList<Word> taggedObservations;
-	Viterbi(ArrayList<Word> observations, ArrayList<ObservationLikelihoodTableEntry> observationLikelihoodTable,
+	ArrayList<Sentence> observationSentences;
+	ArrayList<ArrayList<Word>> hmmTaggedSentences;
+	Viterbi(ArrayList<Sentence> observations, ArrayList<ObservationLikelihoodTableEntry> observationLikelihoodTable,
 			ArrayList<ArrayList<Double>> transitionProbabilitiesTable, Map<EmotionOfSentenceTag,Double> initialStateProbabilities,
 			ArrayList<EmotionOfSentenceTag> order){
-		this.observations = observations;
+		this.observationSentences = observations;
 		this.observationLikelihoodTable = observationLikelihoodTable;
 		this.transitionProbabilitiesTable = transitionProbabilitiesTable;
 		this.initialStateProbabilities = initialStateProbabilities;
 		this.order = order;
+		hmmTaggedSentences = new ArrayList<>();
 		viterbi = new ArrayList<>();
-		performViterbi();
-		taggedObservations = traceBackStep();
+		performViterbiForAllSentences();
 	}
-	public ArrayList<Word> getTaggedObservations(){
-		return taggedObservations;
+	public ArrayList<ArrayList<Word>> getTaggedSentences(){
+		return hmmTaggedSentences;
 	}
-	public void performViterbi(){
-		initializationStep();
-		for(Word x: observations){
-			performViterbiStep(x);
+	public void performViterbi(Sentence sentences){
+		initializationStep(sentences);
+		for(int i = 1; i < sentences.getWords().size(); ++ i){
+			performViterbiStep(sentences.getWords().get(i));
+		}
+	}
+	public void performViterbiForAllSentences(){
+		for(Sentence s: observationSentences){
+			performViterbi(s);
+			hmmTaggedSentences.add(traceBackStep(s));
+			viterbi.clear();
 		}
 	}
 	
-	public ArrayList<Word> traceBackStep(){
+	public ArrayList<Word> traceBackStep(Sentence s){
 		ArrayList<Word> hmmTaggedDataSet = new ArrayList<>();
-		for(int i = 0; i < observations.size() - 1; ++i){
-			Word word = new Word(observations.get(i).getWord());
+		for(int i = 0; i < (s.getWords().size() - 1); ++i){
+			Word word = new Word(s.getWords().get(i).getWord());
 			word.setEmmoodTag(viterbi.get(i + 1).lastChoice);
 			hmmTaggedDataSet.add(word);
 		}
-		Word lastWord = new Word(observations.get(observations.size() - 1).getWord());
+		Word lastWord = new Word(s.getWords().get(s.getWords().size() - 1).getWord());
 		lastWord.setEmmoodTag(order.get(getMostProbableHiddenState(viterbi.get(viterbi.size() - 1).viterbiValues)));
+		hmmTaggedDataSet.add(lastWord);
 		return hmmTaggedDataSet;
 	}
 	
@@ -58,12 +69,7 @@ public class Viterbi {
 		ArrayList<Double> viterbiValues = new ArrayList<Double>();
 		Map<EmotionOfSentenceTag, Double> likelihoods = findObservationLikelihoodMap(word);
 		newViterbiEntry.lastChoice = order.get(indexOfLastHighestVertbi);
-		System.out.println("The current word is: " + word.getWord());
 		for(EmotionOfSentenceTag e: order){
-			System.out.println("The size is: " + viterbi.size());
-			System.out.println("The last highest virtbi value is: " + viterbi.get(viterbi.size() - 1).viterbiValues.get(indexOfLastHighestVertbi) );
-			System.out.println("The likelihoods are " + likelihoods.get(e));
-			System.out.println("The transition probability is " + transitionProbabilitiesTable.get(indexOfLastHighestVertbi).get(e.tagNumber));
 			viterbiValues.add(viterbi.get(viterbi.size() - 1).viterbiValues.get(indexOfLastHighestVertbi) * likelihoods.get(e) * transitionProbabilitiesTable.get(indexOfLastHighestVertbi).get(e.tagNumber));
 		}
 		newViterbiEntry.viterbiValues = viterbiValues;
@@ -71,10 +77,10 @@ public class Viterbi {
 	}
 	
 	
-	public void initializationStep(){
-		ViterbiEntry viterbiEntry = new ViterbiEntry(observations.get(0));
+	public void initializationStep(Sentence sentence){
+		ViterbiEntry viterbiEntry = new ViterbiEntry(sentence.getWords().get(0));
 		ArrayList<Double> viterbiValues = new ArrayList<>();
-		Map<EmotionOfSentenceTag, Double> likelihoods = findObservationLikelihoodMap(observations.get(0));
+		Map<EmotionOfSentenceTag, Double> likelihoods = findObservationLikelihoodMap(sentence.getWords().get(0));
 		for(EmotionOfSentenceTag e: order){
 			Double viterbiValue = initialStateProbabilities.get(e) * likelihoods.get(e);
 			viterbiValues.add(viterbiValue);
@@ -91,10 +97,8 @@ public class Viterbi {
 			}
 		}
 		if(likelihoods.size() == 0){
-			System.out.println("We found a word we don't know :(");
 			return getEqualLikelihoodTable();
 		}
-		System.out.println("We found a word we know!");
 		return likelihoods;
 	}
 	public Map<EmotionOfSentenceTag, Double> getEqualLikelihoodTable(){
@@ -127,7 +131,5 @@ public class Viterbi {
 		ViterbiEntry(Word observationWord){
 			this.observationWord = observationWord;
 		}
-
-		
 	}
 }

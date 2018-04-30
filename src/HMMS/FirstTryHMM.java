@@ -28,7 +28,7 @@ public class FirstTryHMM extends HMM {
 	 * */
 	public FirstTryHMM(ArrayList<Sentence> sentences, double trainingDataPercentage){
 		super(sentences,trainingDataPercentage);
-		
+
 	}
 	/*This table represents the probabilities of transitions between all of the
 	 * hidden states.  In this case the hidden states are the emmood tags.
@@ -37,6 +37,7 @@ public class FirstTryHMM extends HMM {
 	protected void makeTransitionProbabilitiesTable() {
 		Map<EmotionOfSentenceTag,Integer> emmoodTagsCounter = new HashMap<>();
 		emmoodTagsCounter = clean(emmoodTagsCounter);
+		ArrayList<Word> trainingWords = makeTrainingWords();
 		for(EmotionOfSentenceTag e: order){
 			for(int i = 1; i < trainingWords.size(); ++i){
 				if(trainingWords.get(i).getEmoodTag().equals(e)){
@@ -48,6 +49,16 @@ public class FirstTryHMM extends HMM {
 			emmoodTagsCounter = clean(emmoodTagsCounter);
 		}
 	}
+	public ArrayList<Word> makeTrainingWords(){
+		ArrayList<Word> trainingWords = new ArrayList<>();
+		for(Sentence s: trainingDataSentences){
+			for(Word w: s.getWords()){
+				trainingWords.add(w);
+			}
+		}
+		return trainingWords;
+	}
+
 	private ArrayList<Double> convertCountsToProbabilities(Map<EmotionOfSentenceTag,Integer> emmoodTagsCounter){
 		ArrayList<Double> probs = new ArrayList<>();
 		int totalSum = 0;
@@ -70,22 +81,28 @@ public class FirstTryHMM extends HMM {
 	 * that is the P(a given word|the emmood tag) */
 	@Override
 	protected void makeObservationLikelihoodTable() {
-		System.out.println("The size of training words is: " + trainingWords.size());
 		int i = 0;
-		for(Word w: trainingWords){
-			//Override equals method but I am not sure if that helps with
-			//This check.  Definiatly debug this biz;
-			if(i % 2000 == 0){
-				System.out.println("We are " + ((double) i / (double) trainingWords.size()) * 100 + "% done");
+		for(Sentence s: trainingDataSentences){
+			for(Word w: s.getWords()){
+				i++;
 			}
-			i++;
-			if(observationLikelihoodTable.contains(w.getWord())){
-				incrementPresentObservationLikelihoodTable(w.getWord(),w.getEmoodTag());
-			}
-			else{
-				ObservationLikelihoodTableEntry olt = new ObservationLikelihoodTableEntry(order,w.getWord());
-				olt.incrementEmmoodCount(w.getEmoodTag());
-				observationLikelihoodTable.add(olt);
+		}
+		int trainingWordsSize = i;
+		i = 0;
+		for(Sentence s: trainingDataSentences){
+			for(Word w: s.getWords()){
+				if(i % 1000 == 0){
+					System.out.println("We are " + ((double) i / (double) trainingWordsSize) * 100 + "% done");
+				}
+				i++;
+				if(observationLikelihoodTable.contains(w.getWord())){
+					incrementPresentObservationLikelihoodTable(w.getWord(),w.getEmoodTag());
+				}
+				else{
+					ObservationLikelihoodTableEntry olt = new ObservationLikelihoodTableEntry(order,w.getWord());
+					olt.incrementEmmoodCount(w.getEmoodTag());
+					observationLikelihoodTable.add(olt);
+				}
 			}
 		}
 		for(ObservationLikelihoodTableEntry x: observationLikelihoodTable){
@@ -100,12 +117,12 @@ public class FirstTryHMM extends HMM {
 		}
 	}
 	@Override
-	protected ArrayList<Word> tagTestingSet() {
-		viterbi = new Viterbi(testingWords,observationLikelihoodTable,
+	protected ArrayList<ArrayList<Word>> tagTestingSet() {
+		viterbi = new Viterbi(testingDataSentences,observationLikelihoodTable,
 				transitionProbabilitiesTable, initialStateProbabilities, order);
-		
-		return viterbi.getTaggedObservations();
+
+		return viterbi.getTaggedSentences();
 	}
-	
+
 
 }
