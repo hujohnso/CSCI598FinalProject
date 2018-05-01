@@ -31,5 +31,10 @@ public class Word {
 	public void setPos(PartOfSpeech pos) {
 		this.pos = pos;
 	}
+	@Override
+	public String toString(){
+		String wordEntry = this.getWord() + " " + this.getEmoodTag() + "||";
+		return wordEntry;
+	}
 	
 }

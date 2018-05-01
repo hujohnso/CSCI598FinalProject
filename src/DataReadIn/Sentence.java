@@ -12,7 +12,7 @@ public class Sentence {
 	private EmotionOfSentenceTag dominateEmotion;
 	private String sentence;
 	private ArrayList<Word> words;
-	
+
 	Sentence(String fullSentenceEntry, String story){
 		this.fullSentenceEntry = fullSentenceEntry;
 		this.story = story;
@@ -22,11 +22,11 @@ public class Sentence {
 	//Example Sentence entry: 22:22	N:N	F:F	She shut the door violently, and ran away.
 	private void processFullSentenceEntry(String fullSentenceEntry){
 		try{
-		String [] fullSentenceArray = fullSentenceEntry.split("\\s+");
-		this.sentenceNumber = extractSentenceNumber(fullSentenceArray);
-		this.emotionTags = extractEmotionTags(fullSentenceArray);
-		this.sentence = extractFullSentence(fullSentenceArray);
-		this.words = extractWords();
+			String [] fullSentenceArray = fullSentenceEntry.split("\\s+");
+			this.sentenceNumber = extractSentenceNumber(fullSentenceArray);
+			this.emotionTags = extractEmotionTags(fullSentenceArray);
+			this.sentence = extractFullSentence(fullSentenceArray);
+			this.words = extractWords();
 		}
 		catch(Exception e){
 			System.out.println("Reading in data failed on the full sentence entry: " + fullSentenceEntry);
@@ -55,7 +55,7 @@ public class Sentence {
 		}
 		return emotionOfSentenceTags;
 	}
-	
+
 	private String extractFullSentence(String [] fullSentenceArray){
 		String sentence = "";
 		for(int i = 3; i < fullSentenceArray.length; ++i){
@@ -63,7 +63,7 @@ public class Sentence {
 		}
 		return sentence;
 	}
-	
+
 	private ArrayList<Word> extractWords(){
 		ArrayList<Word> words = new ArrayList<>();
 		for(String x: sentence.split("\\s+")){
@@ -74,7 +74,7 @@ public class Sentence {
 		}
 		return words;
 	}
-	
+
 	public ArrayList<EmotionOfSentenceTag> getEmotionTags() {
 		return emotionTags;
 	}
@@ -162,5 +162,13 @@ public class Sentence {
 			}
 		}
 		return winningEOST;
+	}
+	@Override
+	public String toString(){
+		String toString = "";
+		for(Word w: words){
+			toString = toString + w.toString();
+		}
+		return toString;
 	}
 }

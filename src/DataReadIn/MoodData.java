@@ -114,4 +114,23 @@ public class MoodData {
 			System.out.println(x);
 		}
 	}
+	//So the theory here is that only certian parts of speech matter
+	public void filterOutIrrelvantPartsOfSpeech(){
+		ArrayList<Word> filterOut = new ArrayList<>();
+		for(Sentence x: sentences){
+			for(Word w: x.getWords()){
+				if(!w.getPos().getCarriesEmotionalForce()){
+					filterOut.add(w);
+				}
+			}
+			for(Word w: filterOut){
+				x.getWords().remove(w);
+			}
+		}
+
+	}
+	
+	public void convertToSecondTier(){
+		
+	}
 }

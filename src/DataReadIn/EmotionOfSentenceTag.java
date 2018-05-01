@@ -1,24 +1,34 @@
 package DataReadIn;
 
 public enum EmotionOfSentenceTag {
-	HAPPY("H",7),
-	SUPPRIZED_PLUS("Su+",1),
-	SUPRIZED_NEG("Su-",2),
-	FEERFUL("F",3),
-	SAD("S",4),
-	ANGRY("A", 0),
-	DISGUSTED("D",5),
-	NEUTRAL("N",6),
-	NEGATIVE("-", 8),
-	POSITIVE("+",9);
+	NEUTRAL("N",6,null),
+	NEGATIVE("-", 8,null),
+	POSITIVE("+",9,null),
+	HAPPY("H",7,EmotionOfSentenceTag.POSITIVE),
+	SUPPRIZED_PLUS("Su+",1,EmotionOfSentenceTag.POSITIVE),
+	SUPRIZED_NEG("Su-",2,EmotionOfSentenceTag.NEGATIVE),
+	FEERFUL("F",3,EmotionOfSentenceTag.NEGATIVE),
+	SAD("S",4,EmotionOfSentenceTag.NEGATIVE),
+	ANGRY("A", 0,EmotionOfSentenceTag.NEGATIVE),
+	DISGUSTED("D",5,EmotionOfSentenceTag.NEGATIVE);
 	private final String tagValue;
 	//Used as a convince for Viterbi algorithm
 	public int tagNumber;
-	EmotionOfSentenceTag(String tagValue, int tagNumber){
+	private EmotionOfSentenceTag secondTier;
+	EmotionOfSentenceTag(String tagValue, int tagNumber, EmotionOfSentenceTag secondTier){
 		this.tagValue = tagValue;
+		this.tagNumber = tagNumber;
+		this.secondTier = secondTier;
 	}
 	public String getTag(){
 		return tagValue;
 	}
+	public int getTagNumber(){
+		return tagNumber;
+	}
+	public EmotionOfSentenceTag getSecondTier(){
+		return secondTier;
+	}
+	
 	
 }

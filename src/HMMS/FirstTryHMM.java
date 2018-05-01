@@ -120,9 +120,57 @@ public class FirstTryHMM extends HMM {
 	protected ArrayList<ArrayList<Word>> tagTestingSet() {
 		viterbi = new Viterbi(testingDataSentences,observationLikelihoodTable,
 				transitionProbabilitiesTable, initialStateProbabilities, order);
-
-		return viterbi.getTaggedSentences();
+		ArrayList<ArrayList<Word>> hmmTaggedWords = viterbi.getTaggedSentences();
+		return findDominateEmotion(hmmTaggedWords);
+	}
+	
+	private ArrayList<ArrayList<Word>> findDominateEmotion(ArrayList<ArrayList<Word>> taggedTestingSet){
+		Map<EmotionOfSentenceTag, Integer> emmoodCounts = new HashMap<>();
+		for(int i = 0; i < taggedTestingSet.size(); ++i){
+//			System.out.println("Correct: " + testingDataSentences.get(i).toString());
+//			System.out.println(taggedTestingSet.get(i).toString());
+			for(EmotionOfSentenceTag e: order){
+				emmoodCounts.put(e, 0);
+			}
+			for(Word words: taggedTestingSet.get(i)){
+				int count = emmoodCounts.get(words.getEmoodTag());
+				emmoodCounts.put(words.getEmoodTag(), count + 1);
+			}
+			EmotionOfSentenceTag domEmotion = null;
+			int currentHighestCount = -1;
+			for(EmotionOfSentenceTag e: order){
+				if(emmoodCounts.get(e) > currentHighestCount){
+					currentHighestCount = emmoodCounts.get(e);
+					domEmotion = e;
+				}
+			}
+			for(Word words: taggedTestingSet.get(i)){
+				words.setEmmoodTag(domEmotion);
+			}
+			//System.out.println(taggedTestingSet.get(i).toString());
+			emmoodCounts.clear();
+		}
+		return taggedTestingSet;
 	}
 
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
