@@ -19,12 +19,10 @@ public abstract class HMM {
 	protected ArrayList<ObservationLikelihoodTableEntry> observationLikelihoodTable;
 	protected Map<EmotionOfSentenceTag,Integer> initCounts;
 	protected Map<EmotionOfSentenceTag,Double> initialStateProbabilities;
-	protected int numberOfTaggedSentencesNotNeutral;
 	protected int totalCorrectSentences;
 	protected int totalSentences;
 	protected int totalNeutralSentences;
-
-	protected HMM_Statistics stats;
+	public HMM_Statistics stats;
 	protected Viterbi viterbi;
 	HMM(ArrayList<Sentence> sentences, double trainingDataPercentage){
 		init();
@@ -38,10 +36,11 @@ public abstract class HMM {
 		System.out.println("Making observation likelihood table...");
 		makeObservationLikelihoodTable();
 		System.out.println("Finished making Observation likelihood table");
+		findCorrectPercentageSentences();
 	}
-	public double perOfUnknownWords(){
-		return (double) viterbi.getNumberOfUnseenWords() / (double) viterbi.getNumberOfWords();
-	}
+	protected abstract void makeTransitionProbabilitiesTable();
+	protected abstract void makeObservationLikelihoodTable();
+	protected abstract ArrayList<ArrayList<Word>> tagTestingSet();
 	public void init(){
 		trainingDataSentences = new ArrayList<>();
 		testingDataSentences = new ArrayList<>();
@@ -50,7 +49,6 @@ public abstract class HMM {
 		transitionProbabilitiesTable = new ArrayList<>();
 		observationLikelihoodTable = new ArrayList<>();
 		initialStateProbabilities = new HashMap<>();
-		numberOfTaggedSentencesNotNeutral = 0;
 		totalCorrectSentences = 0;
 		totalSentences = 0;
 		totalNeutralSentences = 0;
@@ -60,8 +58,9 @@ public abstract class HMM {
 	}
 	public void fillTestAndTrainingData(ArrayList<Sentence> sentences, double trainingDataPercentage){
 		int numberOfTrainingSentences = (int) (sentences.size() * trainingDataPercentage);
-		stats.setTrainingDataSize(numberOfTrainingSentences);
-		stats.setTestingDataSize(sentences.size() - numberOfTrainingSentences);
+		stats.setTrainingDataSizeInSentences(numberOfTrainingSentences);
+		stats.setTestingDataSizeInSentences(sentences.size() - numberOfTrainingSentences);
+		stats.setPercentageTrainedOn(trainingDataPercentage);
 		for(int i = 0; i < sentences.size(); i++){
 			if( i <= numberOfTrainingSentences){
 				trainingDataSentences.add(sentences.get(i));
@@ -71,8 +70,6 @@ public abstract class HMM {
 			}
 		}
 	}
-	//This is purely to preserve order.  Because I don't know what kind of 
-	//Map iterator vudo maps do.
 	public void initOrderOfSentenceArray(){
 		order.add(EmotionOfSentenceTag.ANGRY);
 		order.add(EmotionOfSentenceTag.SUPPRIZED_PLUS);
@@ -111,9 +108,6 @@ public abstract class HMM {
 			initCounts.put(e, 0);
 		}
 	}
-	protected abstract void makeTransitionProbabilitiesTable();
-	protected abstract void makeObservationLikelihoodTable();
-	protected abstract ArrayList<ArrayList<Word>> tagTestingSet();
 	public double findCorrectPercentage(){
 		ArrayList<ArrayList<Word>> hmmTaggedWords = tagTestingSet();
 		int totalCorrectWords = 0;
@@ -127,12 +121,15 @@ public abstract class HMM {
 				totalWords++;
 			}
 		}
+		stats.setTestingDataSizeInWords(totalWords);
+		stats.setTotalCorrectWords(totalCorrectWords);
 		return (double) totalCorrectWords / (double) totalWords;
 	}
 	public double findCorrectPercentageSentences(){
 		ArrayList<ArrayList<Word>> hmmTaggedWords = tagTestingSet();
 		totalCorrectSentences = 0;
 		totalSentences = 0;
+		int numberOfTaggedSentencesNotNeutral = 0;
 		for(int i = 0; i < testingDataSentences.size(); i++){
 			totalSentences++;
 			if(testingDataSentences.get(i).getWords().get(0).getEmoodTag().equals(EmotionOfSentenceTag.NEUTRAL)){
@@ -149,11 +146,12 @@ public abstract class HMM {
 				System.out.println("Testing data: " + testingDataSentences.get(i));
 			}			
 		}
+		stats.setPercentageOfUnknownWords(viterbi.getNumberOfUnseenWords() / (double) viterbi.getNumberOfWords());
+		stats.setTotalNeutralSentences(totalNeutralSentences);
+		stats.setTotalCorrectSentences(totalCorrectSentences);
+		stats.setNumberOfTaggedSentencesNotNeutral(numberOfTaggedSentencesNotNeutral);
+		stats.setTotalCorrectPercentage((double) totalCorrectSentences / (double) totalSentences);
 		return (double) totalCorrectSentences / (double) totalSentences;
-	}
-		
-	public int getNumberOfTaggedSentencesNotNeutral(){
-		return numberOfTaggedSentencesNotNeutral;
 	}
 	public int getTotalCorrectSentences(){
 		return totalCorrectSentences;
@@ -161,9 +159,4 @@ public abstract class HMM {
 	public int getTotalNeutralSentences(){
 		return totalNeutralSentences;
 	}
-	
-	
-	
-	
-	
 }

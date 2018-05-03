@@ -9,30 +9,9 @@ import DataReadIn.Sentence;
 import DataReadIn.Word;
 
 public class FirstTryHMM extends HMM {
-	/*This is my first try HMM it will be the easiest one.  First however I will go over my assumptions
-	 * for this model.
-	 * 
-	 * For this model the hidden states will of course be the emotional tag for that word.
-	 *
-	 * 
-	 * ASSUMPTIONS:
-	 * 1. I will assume that the emotion of the sentence will tag the training set will be the tag to all
-	 * of its parts.  This will not be the case in later models that I do.  I remember one of the papers
-	 * talking about how only certian parts of speech will cause an effect.  This however will be my base
-	 * model that I try to improve on.  
-	 * 
-	 * 2. I will also assume that the emotion of the word only depends on the last emotion tag. Later models
-	 * will have different levels of going back.
-	 * 
-	 * 
-	 * */
 	public FirstTryHMM(ArrayList<Sentence> sentences, double trainingDataPercentage){
 		super(sentences,trainingDataPercentage);
-
 	}
-	/*This table represents the probabilities of transitions between all of the
-	 * hidden states.  In this case the hidden states are the emmood tags.
-	 * the rows and columns are both emmood tags.*/
 	@Override
 	protected void makeTransitionProbabilitiesTable() {
 		Map<EmotionOfSentenceTag,Integer> emmoodTagsCounter = new HashMap<>();
@@ -56,6 +35,7 @@ public class FirstTryHMM extends HMM {
 				trainingWords.add(w);
 			}
 		}
+		stats.setTrainingDataSizeInWords(trainingWords.size());
 		return trainingWords;
 	}
 
@@ -135,7 +115,7 @@ public class FirstTryHMM extends HMM {
 				emmoodCounts.put(words.getEmoodTag(), count + 1);
 			}
 			EmotionOfSentenceTag domEmotion = null;
-			int currentHighestCount = -1;
+			//int currentHighestCount = -1;
 			for(EmotionOfSentenceTag e: order){
 				//////////////fidle
 //				if(emmoodCounts.get(e) > currentHighestCount){
@@ -144,11 +124,17 @@ public class FirstTryHMM extends HMM {
 //				}
 				/////fidle
 				//OnlyEverTwoRightNow
-				if(emmoodCounts.get(e) > (taggedTestingSet.get(i).size()/4) && !e.equals(EmotionOfSentenceTag.NEUTRAL)){
+				if(emmoodCounts.get(e) > 3 && !e.equals(EmotionOfSentenceTag.NEUTRAL)){
 					if(domEmotion != null){
 						domEmotion = emmoodCounts.get(e) > emmoodCounts.get(domEmotion) ? e:domEmotion;
 					}
+					else{
+						domEmotion = e;
+					}
 				}
+			}
+			if(domEmotion == null){
+				domEmotion = EmotionOfSentenceTag.NEUTRAL;
 			}
 			for(Word words: taggedTestingSet.get(i)){
 				words.setEmmoodTag(domEmotion);
@@ -157,25 +143,4 @@ public class FirstTryHMM extends HMM {
 		}
 		return taggedTestingSet;
 	}
-
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
