@@ -1,0 +1,1 @@
+ The % trained on is: 0.8 The % correct is: 0.6473666993784757
