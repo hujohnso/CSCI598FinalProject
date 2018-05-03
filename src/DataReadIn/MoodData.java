@@ -42,6 +42,7 @@ public class MoodData {
 			System.out.println(e.getMessage());
 		}
 		filterSentences();
+		convertToSecondTier();
 	}
 	private void filterSentences(){
 		ArrayList<Sentence> sentencesToRemove = new ArrayList<>();
@@ -117,7 +118,11 @@ public class MoodData {
 	//So the theory here is that only certian parts of speech matter
 	public void filterOutIrrelvantPartsOfSpeech(){
 		ArrayList<Word> filterOut = new ArrayList<>();
+		ArrayList<Sentence> filterOutSentences = new ArrayList<>();
 		for(Sentence x: sentences){
+			if(x.getWords().size() == 0){
+				filterOutSentences.add(x);
+			}
 			for(Word w: x.getWords()){
 				if(!w.getPos().getCarriesEmotionalForce()){
 					filterOut.add(w);
@@ -126,11 +131,20 @@ public class MoodData {
 			for(Word w: filterOut){
 				x.getWords().remove(w);
 			}
+			if(x.getWords().size() == 0){
+				filterOutSentences.add(x);
+			}
 		}
-
+		sentences.removeAll(filterOutSentences);
 	}
 	
 	public void convertToSecondTier(){
-		
+		for(Sentence x: sentences){
+			for(Word w: x.getWords()){
+				if(w.getEmoodTag().getSecondTier() != null){
+					w.setEmmoodTag(w.getEmoodTag().getSecondTier());
+				}
+			}
+		}
 	}
 }

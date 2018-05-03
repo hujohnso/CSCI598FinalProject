@@ -19,6 +19,10 @@ public abstract class HMM {
 	protected ArrayList<ObservationLikelihoodTableEntry> observationLikelihoodTable;
 	protected Map<EmotionOfSentenceTag,Integer> initCounts;
 	protected Map<EmotionOfSentenceTag,Double> initialStateProbabilities;
+	protected int numberOfTaggedSentencesNotNeutral;
+	protected int totalCorrectSentences;
+	protected int totalSentences;
+	protected int totalNeutralSentences;
 
 	protected HMM_Statistics stats;
 	protected Viterbi viterbi;
@@ -35,6 +39,9 @@ public abstract class HMM {
 		makeObservationLikelihoodTable();
 		System.out.println("Finished making Observation likelihood table");
 	}
+	public double perOfUnknownWords(){
+		return (double) viterbi.getNumberOfUnseenWords() / (double) viterbi.getNumberOfWords();
+	}
 	public void init(){
 		trainingDataSentences = new ArrayList<>();
 		testingDataSentences = new ArrayList<>();
@@ -43,6 +50,10 @@ public abstract class HMM {
 		transitionProbabilitiesTable = new ArrayList<>();
 		observationLikelihoodTable = new ArrayList<>();
 		initialStateProbabilities = new HashMap<>();
+		numberOfTaggedSentencesNotNeutral = 0;
+		totalCorrectSentences = 0;
+		totalSentences = 0;
+		totalNeutralSentences = 0;
 		order = new ArrayList<>();
 		initOrderOfSentenceArray();
 
@@ -118,4 +129,41 @@ public abstract class HMM {
 		}
 		return (double) totalCorrectWords / (double) totalWords;
 	}
+	public double findCorrectPercentageSentences(){
+		ArrayList<ArrayList<Word>> hmmTaggedWords = tagTestingSet();
+		totalCorrectSentences = 0;
+		totalSentences = 0;
+		for(int i = 0; i < testingDataSentences.size(); i++){
+			totalSentences++;
+			if(testingDataSentences.get(i).getWords().get(0).getEmoodTag().equals(EmotionOfSentenceTag.NEUTRAL)){
+				totalNeutralSentences++;
+			}
+			if(hmmTaggedWords.get(i).get(0).getEmoodTag().equals(testingDataSentences.get(i).getWords().get(0).getEmoodTag())){
+				totalCorrectSentences++;
+				if(!hmmTaggedWords.get(i).get(0).getEmoodTag().equals(EmotionOfSentenceTag.NEUTRAL)){
+					numberOfTaggedSentencesNotNeutral++;
+				}
+			}
+			else{
+				System.out.println("Tagged: " + hmmTaggedWords.get(i));
+				System.out.println("Testing data: " + testingDataSentences.get(i));
+			}			
+		}
+		return (double) totalCorrectSentences / (double) totalSentences;
+	}
+		
+	public int getNumberOfTaggedSentencesNotNeutral(){
+		return numberOfTaggedSentencesNotNeutral;
+	}
+	public int getTotalCorrectSentences(){
+		return totalCorrectSentences;
+	}
+	public int getTotalNeutralSentences(){
+		return totalNeutralSentences;
+	}
+	
+	
+	
+	
+	
 }

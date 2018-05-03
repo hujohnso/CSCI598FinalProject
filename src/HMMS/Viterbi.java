@@ -21,6 +21,8 @@ public class Viterbi {
 	ArrayList<Word> taggedObservations;
 	ArrayList<Sentence> observationSentences;
 	ArrayList<ArrayList<Word>> hmmTaggedSentences;
+	int numberOfUnseenWords;
+	int totalNumberOfWords;
 	Viterbi(ArrayList<Sentence> observations, ArrayList<ObservationLikelihoodTableEntry> observationLikelihoodTable,
 			ArrayList<ArrayList<Double>> transitionProbabilitiesTable, Map<EmotionOfSentenceTag,Double> initialStateProbabilities,
 			ArrayList<EmotionOfSentenceTag> order){
@@ -29,6 +31,8 @@ public class Viterbi {
 		this.transitionProbabilitiesTable = transitionProbabilitiesTable;
 		this.initialStateProbabilities = initialStateProbabilities;
 		this.order = order;
+		numberOfUnseenWords = 0;
+		totalNumberOfWords = 0;
 		hmmTaggedSentences = new ArrayList<>();
 		viterbi = new ArrayList<>();
 		performViterbiForAllSentences();
@@ -39,6 +43,7 @@ public class Viterbi {
 	public void performViterbi(Sentence sentences){
 		initializationStep(sentences);
 		for(int i = 1; i < sentences.getWords().size(); ++ i){
+			totalNumberOfWords++;
 			performViterbiStep(sentences.getWords().get(i));
 		}
 	}
@@ -70,10 +75,33 @@ public class Viterbi {
 		Map<EmotionOfSentenceTag, Double> likelihoods = findObservationLikelihoodMap(word);
 		newViterbiEntry.lastChoice = order.get(indexOfLastHighestVertbi);
 		for(EmotionOfSentenceTag e: order){
+//			System.out.println("--------------------------------------------------");
+//			System.out.println("The emmood tag " + e);
+//			System.out.println("The last choice is: " + newViterbiEntry.lastChoice);
+//			System.out.println("The word is: " + word.getWord());
+//			System.out.println("Viterbi  value: " + viterbi.get(viterbi.size() - 1).viterbiValues.get(indexOfLastHighestVertbi));
+//			System.out.println("Likelihood value " + likelihoods.get(e));
+//			System.out.println("Transition value " + transitionProbabilitiesTable.get(indexOfLastHighestVertbi).get(e.tagNumber));
+//			System.out.println("--------------------------------------------------");
 			viterbiValues.add(viterbi.get(viterbi.size() - 1).viterbiValues.get(indexOfLastHighestVertbi) * likelihoods.get(e) * transitionProbabilitiesTable.get(indexOfLastHighestVertbi).get(e.tagNumber));
 		}
 		newViterbiEntry.viterbiValues = viterbiValues;
+		handleDataSparcityIssues(newViterbiEntry);
 		viterbi.add(newViterbiEntry);
+	}
+	
+	//Probabily need a better strategy here but this will work for now!
+	public void handleDataSparcityIssues(ViterbiEntry newViterbiEntry){
+		double highestNewViterbiValue = 0;
+		for(Double nums: newViterbiEntry.viterbiValues){
+			if(highestNewViterbiValue < nums){
+				highestNewViterbiValue = nums;
+			}
+		}
+		if(highestNewViterbiValue == 0){
+			System.out.println("This step had to be performed!!!!!!!!!!!!!!!");
+			newViterbiEntry.viterbiValues = viterbi.get(viterbi.size() - 1).viterbiValues;
+		}
 	}
 	
 	
@@ -102,6 +130,7 @@ public class Viterbi {
 		return likelihoods;
 	}
 	public Map<EmotionOfSentenceTag, Double> getEqualLikelihoodTable(){
+		numberOfUnseenWords++;
 		Map<EmotionOfSentenceTag, Double> equal = new HashMap<>();
 		for(EmotionOfSentenceTag e: order){
 			equal.put(e, 1.0 / (double)order.size());
@@ -131,5 +160,11 @@ public class Viterbi {
 		ViterbiEntry(Word observationWord){
 			this.observationWord = observationWord;
 		}
+	}
+	public int getNumberOfUnseenWords(){
+		return numberOfUnseenWords;
+	}
+	public int getNumberOfWords(){
+		return totalNumberOfWords;
 	}
 }

@@ -148,6 +148,7 @@ public class Sentence {
 		}
 		return emotionMap;
 	}
+	//Put the findWinner after we average the emmood data
 	private EmotionOfSentenceTag findWinner(Map<EmotionOfSentenceTag, Integer> emotionMap){
 		EmotionOfSentenceTag winningEOST = null;
 		int greatestSimular = 0;
