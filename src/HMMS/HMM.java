@@ -145,6 +145,7 @@ public abstract class HMM {
 				System.out.println("Testing data: " + testingDataSentences.get(i));
 			}			
 		}
+		makeContingencyTable(hmmTaggedWords, testingDataSentences);
 		stats.setPercentageOfUnknownWords(viterbi.getNumberOfUnseenWords() / (double) viterbi.getNumberOfWords());
 		stats.setTotalNeutralSentences(totalNeutralSentences);
 		stats.setTotalCorrectSentences(totalCorrectSentences);
@@ -179,23 +180,20 @@ public abstract class HMM {
 				emmoodCounts.put(words.getEmoodTag(), count + 1);
 			}
 			EmotionOfSentenceTag domEmotion = null;
-			//int currentHighestCount = -1;
+			int currentHighestCount = -1;
 			for(EmotionOfSentenceTag e: order){
-				//////////////fidle
-//				if(emmoodCounts.get(e) > currentHighestCount){
-//					currentHighestCount = emmoodCounts.get(e);
-//					domEmotion = e;
-//				}
-				/////fidle
-				//OnlyEverTwoRightNow
-				if(emmoodCounts.get(e) > 3 && !e.equals(EmotionOfSentenceTag.NEUTRAL)){
-					if(domEmotion != null){
-						domEmotion = emmoodCounts.get(e) > emmoodCounts.get(domEmotion) ? e:domEmotion;
-					}
-					else{
-						domEmotion = e;
-					}
+				if(emmoodCounts.get(e) > currentHighestCount){
+					currentHighestCount = emmoodCounts.get(e);
+					domEmotion = e;
 				}
+//				if(emmoodCounts.get(e) > 3 && !e.equals(EmotionOfSentenceTag.NEUTRAL)){
+//					if(domEmotion != null){
+//						domEmotion = emmoodCounts.get(e) > emmoodCounts.get(domEmotion) ? e:domEmotion;
+//					}
+//					else{
+//						domEmotion = e;
+//					}
+//				}
 			}
 			if(domEmotion == null){
 				domEmotion = EmotionOfSentenceTag.NEUTRAL;
@@ -240,4 +238,29 @@ public abstract class HMM {
 		}
 	}
 	
+	protected void makeContingencyTable(ArrayList<ArrayList<Word>> hmmTaggedWords, ArrayList<Sentence> testingSet){
+		ArrayList<ArrayList<Integer>> contingencyTable = new ArrayList<>();
+		for(EmotionOfSentenceTag t: order){
+			ArrayList<Integer> row = new ArrayList<>();
+			for(EmotionOfSentenceTag e: order){
+				row.add(0);
+			}
+			contingencyTable.add(row);
+		}
+		for(int i = 0; i < hmmTaggedWords.size(); i++){
+			if(!hmmTaggedWords.get(i).get(0).getEmoodTag().equals(testingDataSentences.get(i).getWords().get(0).getEmoodTag())){
+				int count = contingencyTable.get(hmmTaggedWords.get(i).get(0).getEmoodTag().tagNumber).get(testingDataSentences.get(i).getWords().get(0).getEmoodTag().tagNumber);
+				contingencyTable.get(hmmTaggedWords.get(i).get(0).getEmoodTag().tagNumber).set(testingDataSentences.get(i).getWords().get(0).getEmoodTag().tagNumber,count + 1);
+			}
+		}
+		stats.setContingencyTable(contingencyTable);
+		stats.setOrder(order);
+	}
+	protected void incrementPresentObservationLikelihoodTable(String word,EmotionOfSentenceTag emmoodTag){
+		for(ObservationLikelihoodTableEntry x: observationLikelihoodTable){
+			if(x.equals(word)){
+				x.incrementEmmoodCount(emmoodTag);
+			}
+		}
+	}
 }

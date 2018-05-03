@@ -1,5 +1,5 @@
 trainingDataSizeInWords, testingDataSizeInWords, trainingDataSizeInSentences, testingDataSizeInSentences, numberOfTaggedSentencesNotNeutral, totalCorrectSentences, totalNeutralSentences, totalCorrectWords, percentageOfUnknownWords, percentageTrainedOn, totalCorrectPercentage
-269034, 0, 12231, 3058, 87, 1979, 2223, 0, 0.08565926784826901, 0.8, 0.6473666993784757
+145619, 0, 10691, 4582, 58, 3143, 3352, 0, 0.12530507244783537, 0.7, 0.6860947391399258
  ,ANGRY ,SUPPRIZED_PLUS ,SUPRIZED_NEG ,FEERFUL ,SAD ,DISGUSTED ,NEUTRAL ,HAPPY ,NEGATIVE ,POSITIVE ,
 ANGRY, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 SUPPRIZED_PLUS, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -7,7 +7,7 @@ SUPRIZED_NEG, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 FEERFUL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 SAD, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 DISGUSTED, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-NEUTRAL, 0, 0, 0, 0, 0, 0, 0, 0, 477, 209
+NEUTRAL, 0, 0, 0, 0, 0, 0, 0, 0, 707, 420
 HAPPY, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-NEGATIVE, 0, 0, 0, 0, 0, 0, 170, 0, 0, 20
-POSITIVE, 0, 0, 0, 0, 0, 0, 161, 0, 41, 0
+NEGATIVE, 0, 0, 0, 0, 0, 0, 123, 0, 0, 11
+POSITIVE, 0, 0, 0, 0, 0, 0, 144, 0, 33, 0

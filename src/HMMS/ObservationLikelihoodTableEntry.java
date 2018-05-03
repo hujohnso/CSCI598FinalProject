@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 //This could have been a map to a map of probabilities but I think this is a logical convince.
 import DataReadIn.EmotionOfSentenceTag;
+import DataReadIn.Word;
 public class ObservationLikelihoodTableEntry {
 	String word;
+	Word extendedWord;
 	public Map<EmotionOfSentenceTag, Double> getEmmoodProbabilities() {
 		return emmoodProbabilities;
 	}
@@ -33,11 +35,29 @@ public class ObservationLikelihoodTableEntry {
 		this.word = word;
 		init(order);
 	}
+	ObservationLikelihoodTableEntry(ArrayList<EmotionOfSentenceTag> order, Word extendedWord){
+		emmoodCounts = new HashMap<>();
+		emmoodProbabilities = new HashMap<>();
+		this.word = extendedWord.getWord();
+		this.extendedWord = extendedWord;
+		init(order);
+	}
+	ObservationLikelihoodTableEntry(Map<EmotionOfSentenceTag,Double> emmoodProbabilities, Word extendedWord){
+		this.word = extendedWord.getWord();
+		this.extendedWord = extendedWord;
+		this.emmoodProbabilities = emmoodProbabilities;
+	}
 	public void init(ArrayList<EmotionOfSentenceTag> order){
 		for(EmotionOfSentenceTag e: order){
 			emmoodCounts.put(e, 0);
 			emmoodProbabilities.put(e, 0.0);
 		}
+	}
+	public Word getExtendedWord() {
+		return extendedWord;
+	}
+	public void setExtendedWord(Word extendedWord) {
+		this.extendedWord = extendedWord;
 	}
 	@Override
 	public boolean equals(Object v){

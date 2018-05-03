@@ -1,20 +1,20 @@
 package HMMS;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import DataReadIn.EmotionOfSentenceTag;
 import DataReadIn.Sentence;
 import DataReadIn.Word;
+import edu.mit.jwi.item.POS;
+import extentionOfTrainingSet.SynonymsHelper;
 
-public class FirstTryHMM extends HMM {
-	public FirstTryHMM(ArrayList<Sentence> sentences, double trainingDataPercentage){
-		super(sentences,trainingDataPercentage);
+public class SynonymsExtendedHMM extends HMM {
+	SynonymsHelper synHelper;
+	SynonymsExtendedHMM(ArrayList<Sentence> sentences, double trainingDataPercentage) {
+		super(sentences, trainingDataPercentage);
 	}
-	/*This table coresponds to each observations likelihood of being in a
-	 * particular hidden state so like for every single word what is the probability
-	 * that is the P(a given word|the emmood tag) */
+	
+
 	@Override
 	protected void makeObservationLikelihoodTable() {
 		int i = 0;
@@ -35,7 +35,7 @@ public class FirstTryHMM extends HMM {
 					incrementPresentObservationLikelihoodTable(w.getWord(),w.getEmoodTag());
 				}
 				else{
-					ObservationLikelihoodTableEntry olt = new ObservationLikelihoodTableEntry(order,w.getWord());
+					ObservationLikelihoodTableEntry olt = new ObservationLikelihoodTableEntry(order,w);
 					olt.incrementEmmoodCount(w.getEmoodTag());
 					observationLikelihoodTable.add(olt);
 				}
@@ -45,11 +45,19 @@ public class FirstTryHMM extends HMM {
 			x.makeEmmoodProbabilities();
 		}
 	}
+	
+	protected void addSynonymsToObservationLikelihoodTable(){
+		for(ObservationLikelihoodTableEntry o: observationLikelihoodTable){
+			for(String s: synHelper.getArrayListOfSyns(o.getWord(),POS.valueOf(o.getExtendedWord().getPos().getWordNetMappedPOS()))){
+				ObservationLikelihoodTableEntry newOLTE = new ObservationLikelihoodTableEntry(o.getEmmoodProbabilities(),o.getExtendedWord());
+				observationLikelihoodTable.add(newOLTE);
+			}
+		}
+	}
+
 	@Override
 	protected ArrayList<ArrayList<Word>> tagTestingSet() {
-		viterbi = new Viterbi(testingDataSentences,observationLikelihoodTable,
-				transitionProbabilitiesTable, initialStateProbabilities, order);
-		ArrayList<ArrayList<Word>> hmmTaggedWords = viterbi.getTaggedSentences();
-		return findDominateEmotion(hmmTaggedWords);
+		return null;
 	}
+	
 }

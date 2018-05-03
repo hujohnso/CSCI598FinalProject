@@ -1,18 +1,24 @@
 package HMMS;
 
+import java.util.ArrayList;
+
+import DataReadIn.EmotionOfSentenceTag;
+
 public class HMM_Statistics {
 	/*This class is for keeping track of statistics and will only handle keeping track of stats.*/
 	int trainingDataSizeInWords;
-	int testingDataSizeInWords; //
-	int trainingDataSizeInSentences; //
-	int testingDataSizeInSentences;  //
-	int numberOfTaggedSentencesNotNeutral; //
-	int totalCorrectSentences; //
-	int totalNeutralSentences; //
-	int totalCorrectWords; //
-	double percentageOfUnknownWords; //
-	double percentageTrainedOn; //
-	double totalCorrectPercentage; //
+	int testingDataSizeInWords;
+	int trainingDataSizeInSentences;
+	int testingDataSizeInSentences;
+	int numberOfTaggedSentencesNotNeutral;
+	int totalCorrectSentences;
+	int totalNeutralSentences;
+	int totalCorrectWords;
+	double percentageOfUnknownWords;
+	double percentageTrainedOn;
+	double totalCorrectPercentage;
+	ArrayList<ArrayList<Integer>> contingencyTable;
+	ArrayList<EmotionOfSentenceTag> order;
 
 	public HMM_Statistics(){
 		trainingDataSizeInWords = 0;
@@ -26,6 +32,7 @@ public class HMM_Statistics {
 		percentageOfUnknownWords= 0;
 		percentageTrainedOn= 0;
 		totalCorrectPercentage = 0;
+		contingencyTable = new ArrayList<>();
 	}
 	public String makeSummaryStatisticsStringForCSV(){
 		String returnString = trainingDataSizeInWords + ", " + 
@@ -56,6 +63,25 @@ public class HMM_Statistics {
 		System.out.println("percentageOfUnknownWords: " + percentageOfUnknownWords);
 		System.out.println("percentageTrainedOn: " + percentageTrainedOn);
 		System.out.println("totalCorrectPercentage: " + totalCorrectPercentage);
+	}
+	
+	public String contingencyTableString(){
+		String contingencyTableString = " ,";
+		for(EmotionOfSentenceTag e: order){
+			contingencyTableString = contingencyTableString + e + " ,";
+		}
+		contingencyTableString = contingencyTableString + "\n";
+		for(int i = 0; i < order.size(); ++i){
+			contingencyTableString = contingencyTableString + order.get(i);
+			for(int j = 0; j < order.size(); ++j){
+				contingencyTableString = contingencyTableString + ", " + contingencyTable.get(i).get(j);
+			}
+			contingencyTableString = contingencyTableString + "\n";
+		}
+		return contingencyTableString;
+	}
+	public void setContingencyTable(ArrayList<ArrayList<Integer>> contingencyTable){
+		this.contingencyTable = contingencyTable;
 	}
 	public int getTrainingDataSizeInWords() {
 		return trainingDataSizeInWords;
@@ -123,4 +149,11 @@ public class HMM_Statistics {
 	public void setTotalCorrectPercentage(double totalCorrectPercentage) {
 		this.totalCorrectPercentage = totalCorrectPercentage;
 	}
+	public ArrayList<EmotionOfSentenceTag> getOrder() {
+		return order;
+	}
+	public void setOrder(ArrayList<EmotionOfSentenceTag> order) {
+		this.order = order;
+	}
+	
 }

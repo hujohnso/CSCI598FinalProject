@@ -42,8 +42,8 @@ public class MoodData {
 			System.out.println(e.getMessage());
 		}
 		filterSentences();
-		convertToSecondTier();
 	}
+	
 	private void filterSentences(){
 		ArrayList<Sentence> sentencesToRemove = new ArrayList<>();
 		for(int i = 0; i < sentences.size(); ++i){
@@ -115,8 +115,8 @@ public class MoodData {
 			System.out.println(x);
 		}
 	}
-	//So the theory here is that only certian parts of speech matter
-	public void filterOutIrrelvantPartsOfSpeech(){
+
+	public ArrayList<Sentence> filterOutIrrelvantPartsOfSpeech(ArrayList<Sentence> sentences){
 		ArrayList<Word> filterOut = new ArrayList<>();
 		ArrayList<Sentence> filterOutSentences = new ArrayList<>();
 		for(Sentence x: sentences){
@@ -136,15 +136,28 @@ public class MoodData {
 			}
 		}
 		sentences.removeAll(filterOutSentences);
+		return sentences;
+	}
+	public ArrayList<Sentence> getFilteredSentences(){
+		return filterOutIrrelvantPartsOfSpeech(sentences);
 	}
 	
-	public void convertToSecondTier(){
-		for(Sentence x: sentences){
+	public ArrayList<Sentence> convertToSecondTier(ArrayList<Sentence> sentences){
+		ArrayList<Sentence> secondTierSentences = new ArrayList<Sentence>();
+		secondTierSentences.addAll(sentences);
+		for(Sentence x: secondTierSentences){
 			for(Word w: x.getWords()){
 				if(w.getEmoodTag().getSecondTier() != null){
 					w.setEmmoodTag(w.getEmoodTag().getSecondTier());
 				}
 			}
 		}
+		return secondTierSentences;
+	}
+	public ArrayList<Sentence> getSecondTierSentences(){
+		return convertToSecondTier(sentences);
+	}
+	public ArrayList<Sentence> getFilteredSecondTierSentences(){
+		return convertToSecondTier(filterOutIrrelvantPartsOfSpeech(sentences));
 	}
 }
