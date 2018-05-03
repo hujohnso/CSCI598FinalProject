@@ -38,7 +38,6 @@ public abstract class HMM {
 		System.out.println("Finished making Observation likelihood table");
 		findCorrectPercentageSentences();
 	}
-	protected abstract void makeTransitionProbabilitiesTable();
 	protected abstract void makeObservationLikelihoodTable();
 	protected abstract ArrayList<ArrayList<Word>> tagTestingSet();
 	public void init(){
@@ -159,4 +158,86 @@ public abstract class HMM {
 	public int getTotalNeutralSentences(){
 		return totalNeutralSentences;
 	}
+	public ArrayList<Word> makeTrainingWords(){
+		ArrayList<Word> trainingWords = new ArrayList<>();
+		for(Sentence s: trainingDataSentences){
+			for(Word w: s.getWords()){
+				trainingWords.add(w);
+			}
+		}
+		stats.setTrainingDataSizeInWords(trainingWords.size());
+		return trainingWords;
+	}
+	protected ArrayList<ArrayList<Word>> findDominateEmotion(ArrayList<ArrayList<Word>> taggedTestingSet){
+		Map<EmotionOfSentenceTag, Integer> emmoodCounts = new HashMap<>();
+		for(int i = 0; i < taggedTestingSet.size(); ++i){
+			for(EmotionOfSentenceTag e: order){
+				emmoodCounts.put(e, 0);
+			}
+			for(Word words: taggedTestingSet.get(i)){
+				int count = emmoodCounts.get(words.getEmoodTag());
+				emmoodCounts.put(words.getEmoodTag(), count + 1);
+			}
+			EmotionOfSentenceTag domEmotion = null;
+			//int currentHighestCount = -1;
+			for(EmotionOfSentenceTag e: order){
+				//////////////fidle
+//				if(emmoodCounts.get(e) > currentHighestCount){
+//					currentHighestCount = emmoodCounts.get(e);
+//					domEmotion = e;
+//				}
+				/////fidle
+				//OnlyEverTwoRightNow
+				if(emmoodCounts.get(e) > 3 && !e.equals(EmotionOfSentenceTag.NEUTRAL)){
+					if(domEmotion != null){
+						domEmotion = emmoodCounts.get(e) > emmoodCounts.get(domEmotion) ? e:domEmotion;
+					}
+					else{
+						domEmotion = e;
+					}
+				}
+			}
+			if(domEmotion == null){
+				domEmotion = EmotionOfSentenceTag.NEUTRAL;
+			}
+			for(Word words: taggedTestingSet.get(i)){
+				words.setEmmoodTag(domEmotion);
+			}
+			emmoodCounts.clear();
+		}
+		return taggedTestingSet;
+	}
+	protected Map<EmotionOfSentenceTag,Integer> clean(Map<EmotionOfSentenceTag,Integer> map){
+		for(EmotionOfSentenceTag e: order){
+			map.put(e, 0);
+		}
+		return map;
+	}
+	public ArrayList<Double> convertCountsToProbabilities(Map<EmotionOfSentenceTag,Integer> emmoodTagsCounter){
+		ArrayList<Double> probs = new ArrayList<>();
+		int totalSum = 0;
+		for(EmotionOfSentenceTag e: order){
+			totalSum = totalSum + emmoodTagsCounter.get(e);
+		}
+		for(EmotionOfSentenceTag e: order){
+			probs.add((double) emmoodTagsCounter.get(e) / (double) totalSum);
+		}
+		return probs;
+	}
+	protected void makeTransitionProbabilitiesTable() {
+		Map<EmotionOfSentenceTag,Integer> emmoodTagsCounter = new HashMap<>();
+		emmoodTagsCounter = clean(emmoodTagsCounter);
+		ArrayList<Word> trainingWords = makeTrainingWords();
+		for(EmotionOfSentenceTag e: order){
+			for(int i = 1; i < trainingWords.size(); ++i){
+				if(trainingWords.get(i).getEmoodTag().equals(e)){
+					int count = emmoodTagsCounter.get(trainingWords.get(i -1).getEmoodTag());
+					emmoodTagsCounter.put(trainingWords.get(i - 1).getEmoodTag(), count + 1);
+				}
+			}
+			transitionProbabilitiesTable.add(convertCountsToProbabilities(emmoodTagsCounter));
+			emmoodTagsCounter = clean(emmoodTagsCounter);
+		}
+	}
+	
 }

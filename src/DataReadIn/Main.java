@@ -16,7 +16,6 @@ public class Main {
 			FirstTryHMM hmm = new FirstTryHMM(moodData.getSentences(), i * .05);
 			writer.write(hmm.stats.makeHeaderForSummarayStatistics() + "\n");
 			writer.write(hmm.stats.makeSummaryStatisticsStringForCSV() + "\n");
-			writer.write(" The % trained on is: " + i * percentage);
 			hmm.stats.printToConsole();
 		}
 		writer.close();
