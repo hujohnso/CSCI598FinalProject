@@ -31,10 +31,14 @@ public class SynonymsHelper {
 		System.out.println("Lemma = " + word.getLemma());
 		System.out.println("Gloss = " + word.getSynset().getGloss());
 	}
-	public SynonymsHelper() throws IOException{
-		URL url = new URL("file", null, "C:\\Program Files (x86)\\WordNet\\2.1\\dict");
-		dict = new Dictionary(url);
-		dict.open();
+	public SynonymsHelper(){
+		try{
+			URL url = new URL("file", null, "C:\\Program Files (x86)\\WordNet\\2.1\\dict");
+			dict = new Dictionary(url);
+			dict.open();
+		}catch(Exception e){
+			System.out.println("Your file didn't open fool!!!!!");
+		}
 	}
 	public String getListOfSyns(String wordForSyn, POS pos){
 		IIndexWord idxWord = dict.getIndexWord(wordForSyn,pos);
@@ -54,7 +58,7 @@ public class SynonymsHelper {
 		ISynset synset = word.getSynset();
 		ArrayList<String> listOfWords = new ArrayList<>();
 		for(IWord w : synset.getWords()){
-			listOfWords.add(w.toString());
+			listOfWords.add(w.getLemma());
 		}
 		return listOfWords;
 	}

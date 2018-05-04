@@ -10,11 +10,9 @@ import extentionOfTrainingSet.SynonymsHelper;
 
 public class SynonymsExtendedHMM extends HMM {
 	SynonymsHelper synHelper;
-	SynonymsExtendedHMM(ArrayList<Sentence> sentences, double trainingDataPercentage) {
+	public SynonymsExtendedHMM(ArrayList<Sentence> sentences, double trainingDataPercentage) {
 		super(sentences, trainingDataPercentage);
 	}
-	
-
 	@Override
 	protected void makeObservationLikelihoodTable() {
 		int i = 0;
@@ -45,19 +43,34 @@ public class SynonymsExtendedHMM extends HMM {
 			x.makeEmmoodProbabilities();
 		}
 	}
-	
+
 	protected void addSynonymsToObservationLikelihoodTable(){
+		synHelper = new SynonymsHelper();
+		System.out.println("The size of the observation likelihoodTable is: " + observationLikelihoodTable.size());
+		ArrayList<ObservationLikelihoodTableEntry> additionalEntries = new ArrayList<>();
 		for(ObservationLikelihoodTableEntry o: observationLikelihoodTable){
-			for(String s: synHelper.getArrayListOfSyns(o.getWord(),POS.valueOf(o.getExtendedWord().getPos().getWordNetMappedPOS()))){
-				ObservationLikelihoodTableEntry newOLTE = new ObservationLikelihoodTableEntry(o.getEmmoodProbabilities(),o.getExtendedWord());
-				observationLikelihoodTable.add(newOLTE);
+			try{
+				ArrayList<String> syns = synHelper.getArrayListOfSyns(o.getWord(),POS.valueOf(o.getExtendedWord().getPos().getWordNetMappedPOS()));
+				for(String s: syns){
+					if(!s.equals(o.getWord())){
+						ObservationLikelihoodTableEntry newOLTE = new ObservationLikelihoodTableEntry(o.getEmmoodProbabilities(),o.getExtendedWord());
+						additionalEntries.add(newOLTE);
+					}
+				}
+			}catch(Exception e){
 			}
 		}
+		observationLikelihoodTable.addAll(additionalEntries);
 	}
 
 	@Override
 	protected ArrayList<ArrayList<Word>> tagTestingSet() {
-		return null;
+		addSynonymsToObservationLikelihoodTable();
+		System.out.println("The size of the observation likelihood table is now: " + observationLikelihoodTable.size());
+		viterbi = new Viterbi(testingDataSentences,observationLikelihoodTable,
+				transitionProbabilitiesTable, initialStateProbabilities, order);
+		ArrayList<ArrayList<Word>> hmmTaggedWords = viterbi.getTaggedSentences();
+		return findDominateEmotion(hmmTaggedWords);
 	}
-	
+
 }
