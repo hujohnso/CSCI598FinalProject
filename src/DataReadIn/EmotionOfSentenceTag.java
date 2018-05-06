@@ -1,6 +1,8 @@
 package DataReadIn;
 
-public enum EmotionOfSentenceTag {
+import java.io.Serializable;
+
+public enum EmotionOfSentenceTag implements Serializable {
 	NEUTRAL("N",6,null),
 	NEGATIVE("-", 8,null),
 	POSITIVE("+",9,null),

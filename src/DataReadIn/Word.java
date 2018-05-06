@@ -1,8 +1,9 @@
 package DataReadIn;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Word {
+public class Word implements Serializable{
 	private String word;
 	private PartOfSpeech pos;
 	private EmotionOfSentenceTag emmoodTag;

@@ -1,13 +1,23 @@
 package HMMS;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 //This could have been a map to a map of probabilities but I think this is a logical convince.
 import DataReadIn.EmotionOfSentenceTag;
 import DataReadIn.Word;
-public class ObservationLikelihoodTableEntry {
+public class ObservationLikelihoodTableEntry implements Serializable {
+	private static final long serialVersionUID = 1L;
 	String word;
 	Word extendedWord;
+	Map<EmotionOfSentenceTag,Integer> emmoodCounts;
+	Map<EmotionOfSentenceTag,Double> emmoodProbabilities;
+	ObservationLikelihoodTableEntry(String word, Word extendedWord, Map<EmotionOfSentenceTag,Integer> emmoodCounts,Map<EmotionOfSentenceTag,Double> emmoodProbabilities){
+		this.word = word;
+		this.extendedWord = extendedWord;
+		this.emmoodCounts = emmoodCounts;
+		this.emmoodProbabilities = emmoodProbabilities;
+	}
 	public Map<EmotionOfSentenceTag, Double> getEmmoodProbabilities() {
 		return emmoodProbabilities;
 	}
@@ -21,10 +31,6 @@ public class ObservationLikelihoodTableEntry {
 	public void setWord(String word) {
 		this.word = word;
 	}
-
-	Map<EmotionOfSentenceTag,Integer> emmoodCounts;
-	Map<EmotionOfSentenceTag,Double> emmoodProbabilities;
-	
 	public void incrementEmmoodCount(EmotionOfSentenceTag emmoodTag){
 		int count = emmoodCounts.get(emmoodTag);
 		emmoodCounts.put(emmoodTag, count + 1);

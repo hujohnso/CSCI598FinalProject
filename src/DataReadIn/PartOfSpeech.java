@@ -1,6 +1,9 @@
 package DataReadIn;
+
+import java.io.Serializable;
+
 //Made from the Penn Treebank Project
-public enum PartOfSpeech {
+public enum PartOfSpeech implements Serializable{
 	CC("Coordinating conjunction", false, null),
 	CD("Cardinal number", false, null),
 	DT("Determiner", false, null),

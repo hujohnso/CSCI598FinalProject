@@ -75,14 +75,6 @@ public class Viterbi {
 		Map<EmotionOfSentenceTag, Double> likelihoods = findObservationLikelihoodMap(word);
 		newViterbiEntry.lastChoice = order.get(indexOfLastHighestVertbi);
 		for(EmotionOfSentenceTag e: order){
-//			System.out.println("--------------------------------------------------");
-//			System.out.println("The emmood tag " + e);
-//			System.out.println("The last choice is: " + newViterbiEntry.lastChoice);
-//			System.out.println("The word is: " + word.getWord());
-//			System.out.println("Viterbi  value: " + viterbi.get(viterbi.size() - 1).viterbiValues.get(indexOfLastHighestVertbi));
-//			System.out.println("Likelihood value " + likelihoods.get(e));
-//			System.out.println("Transition value " + transitionProbabilitiesTable.get(indexOfLastHighestVertbi).get(e.tagNumber));
-//			System.out.println("--------------------------------------------------");
 			viterbiValues.add(viterbi.get(viterbi.size() - 1).viterbiValues.get(indexOfLastHighestVertbi) * likelihoods.get(e) * transitionProbabilitiesTable.get(indexOfLastHighestVertbi).get(e.tagNumber));
 		}
 		newViterbiEntry.viterbiValues = viterbiValues;

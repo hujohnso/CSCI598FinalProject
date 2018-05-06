@@ -19,6 +19,16 @@ public class Sentence {
 		processFullSentenceEntry(preprocessing(this.fullSentenceEntry));
 		findAndSetDominateEmotion();
 	}
+	
+	public Sentence(String normalSentence){
+		words = new ArrayList<>();
+		normalSentence = filterPunctutaionOutOfWords(normalSentence);
+		String [] sentence = normalSentence.split(" ");
+		for(String s: sentence){
+			Word newWord = new Word(s);
+			words.add(newWord);
+		}
+	}
 	//Example Sentence entry: 22:22	N:N	F:F	She shut the door violently, and ran away.
 	private void processFullSentenceEntry(String fullSentenceEntry){
 		try{

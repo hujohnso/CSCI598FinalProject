@@ -10,6 +10,7 @@ import DataReadIn.EmotionOfSentenceTag;
 import DataReadIn.MoodData;
 import DataReadIn.Sentence;
 import DataReadIn.Word;
+import TrainedModel.WriteOutAndReadIn;
 
 public abstract class HMM {
 	protected ArrayList<Sentence> trainingDataSentences;
@@ -24,6 +25,9 @@ public abstract class HMM {
 	protected int totalNeutralSentences;
 	public HMM_Statistics stats;
 	protected Viterbi viterbi;
+	private static final String observationLikelihoodTableFileName = "observationLikelihoodTable.txt";
+	private static final String transitionProbabilitiesTableName =  "transitionProbabilitiesTable.txt";
+	private static final String initialStateProbabilitiesFileName = "initialStateProbabilitiesTable.txt";
 	HMM(ArrayList<Sentence> sentences, double trainingDataPercentage){
 		init();
 		System.out.println("Starting to fill test and training data...");
@@ -37,6 +41,13 @@ public abstract class HMM {
 		makeObservationLikelihoodTable();
 		System.out.println("Finished making Observation likelihood table");
 		findCorrectPercentageSentences();
+	}
+	//Constructor for when we are not just trying to find the correct percentage
+	HMM(){
+		init();
+		readInObservationLikelihoodMap(observationLikelihoodTableFileName);
+		readInTransitionProbabilitiesTable(transitionProbabilitiesTableName);
+		readInInitialStateProbabilitiesTable(initialStateProbabilitiesFileName);
 	}
 	protected abstract void makeObservationLikelihoodTable();
 	protected abstract ArrayList<ArrayList<Word>> tagTestingSet();
@@ -53,7 +64,6 @@ public abstract class HMM {
 		totalNeutralSentences = 0;
 		order = new ArrayList<>();
 		initOrderOfSentenceArray();
-
 	}
 	public void fillTestAndTrainingData(ArrayList<Sentence> sentences, double trainingDataPercentage){
 		int numberOfTrainingSentences = (int) (sentences.size() * trainingDataPercentage);
@@ -92,6 +102,7 @@ public abstract class HMM {
 		}
 	}
 	public void makeInitialProbabilitiesMap(){
+		Boolean writeInitialStateProbabilitiesMap = true;
 		initialCounts();
 		int totalCount = 0;
 		for(EmotionOfSentenceTag x: initCounts.keySet()){
@@ -99,6 +110,10 @@ public abstract class HMM {
 		}
 		for(EmotionOfSentenceTag x: initCounts.keySet()){
 			initialStateProbabilities.put(x,(double)initCounts.get(x) / (double)totalCount);
+		}
+		if(writeInitialStateProbabilitiesMap){
+			WriteOutAndReadIn write = new WriteOutAndReadIn();
+			write.serializeInitial(initialStateProbabilities, initialStateProbabilitiesFileName);
 		}
 	}
 
@@ -186,14 +201,14 @@ public abstract class HMM {
 					currentHighestCount = emmoodCounts.get(e);
 					domEmotion = e;
 				}
-//				if(emmoodCounts.get(e) > 3 && !e.equals(EmotionOfSentenceTag.NEUTRAL)){
-//					if(domEmotion != null){
-//						domEmotion = emmoodCounts.get(e) > emmoodCounts.get(domEmotion) ? e:domEmotion;
-//					}
-//					else{
-//						domEmotion = e;
-//					}
-//				}
+				//				if(emmoodCounts.get(e) > 3 && !e.equals(EmotionOfSentenceTag.NEUTRAL)){
+				//					if(domEmotion != null){
+				//						domEmotion = emmoodCounts.get(e) > emmoodCounts.get(domEmotion) ? e:domEmotion;
+				//					}
+				//					else{
+				//						domEmotion = e;
+				//					}
+				//				}
 			}
 			if(domEmotion == null){
 				domEmotion = EmotionOfSentenceTag.NEUTRAL;
@@ -223,6 +238,7 @@ public abstract class HMM {
 		return probs;
 	}
 	protected void makeTransitionProbabilitiesTable() {
+		Boolean writeTransitionTable = true;
 		Map<EmotionOfSentenceTag,Integer> emmoodTagsCounter = new HashMap<>();
 		emmoodTagsCounter = clean(emmoodTagsCounter);
 		ArrayList<Word> trainingWords = makeTrainingWords();
@@ -236,8 +252,12 @@ public abstract class HMM {
 			transitionProbabilitiesTable.add(convertCountsToProbabilities(emmoodTagsCounter));
 			emmoodTagsCounter = clean(emmoodTagsCounter);
 		}
+		if(writeTransitionTable){
+			WriteOutAndReadIn write = new WriteOutAndReadIn();
+			write.serializeTransition(transitionProbabilitiesTable, "transitionProbabilitiesTable.txt");
+		}
 	}
-	
+
 	protected void makeContingencyTable(ArrayList<ArrayList<Word>> hmmTaggedWords, ArrayList<Sentence> testingSet){
 		ArrayList<ArrayList<Integer>> contingencyTable = new ArrayList<>();
 		for(EmotionOfSentenceTag t: order){
@@ -262,5 +282,17 @@ public abstract class HMM {
 				x.incrementEmmoodCount(emmoodTag);
 			}
 		}
+	}
+	public void readInTransitionProbabilitiesTable(String transitionProbabilitiesFile){
+		WriteOutAndReadIn read = new WriteOutAndReadIn();
+		transitionProbabilitiesTable = read.deserializeTransition(transitionProbabilitiesFile);
+	}
+	public void readInObservationLikelihoodMap(String observationLikelihoodProbabilitiesFile){
+		WriteOutAndReadIn read = new WriteOutAndReadIn();
+		observationLikelihoodTable = read.deserialize(observationLikelihoodProbabilitiesFile);
+	}
+	public void readInInitialStateProbabilitiesTable(String initialStateProbabilitiesFile){
+		WriteOutAndReadIn read = new WriteOutAndReadIn();
+		initialStateProbabilities = read.deserializeInitial(initialStateProbabilitiesFile);
 	}
 }

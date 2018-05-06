@@ -17,6 +17,8 @@ public class HMM_Statistics {
 	double percentageOfUnknownWords;
 	double percentageTrainedOn;
 	double totalCorrectPercentage;
+	int sizeOfObservationLikelihoodTable;
+	int sizeOfObservationLikelihoodTableExtended;
 	ArrayList<ArrayList<Integer>> contingencyTable;
 	ArrayList<EmotionOfSentenceTag> order;
 
@@ -32,6 +34,8 @@ public class HMM_Statistics {
 		percentageOfUnknownWords= 0;
 		percentageTrainedOn= 0;
 		totalCorrectPercentage = 0;
+		sizeOfObservationLikelihoodTable = 0;
+		sizeOfObservationLikelihoodTableExtended = 0;
 		contingencyTable = new ArrayList<>();
 	}
 	public String makeSummaryStatisticsStringForCSV(){
@@ -45,11 +49,13 @@ public class HMM_Statistics {
 		totalCorrectWords + ", " + 
 		percentageOfUnknownWords + ", " + 
 		percentageTrainedOn + ", " +
-		totalCorrectPercentage;
+		totalCorrectPercentage + ", " +
+		sizeOfObservationLikelihoodTable + ", " +
+		sizeOfObservationLikelihoodTableExtended;
 		return returnString;
 	}
 	public String makeHeaderForSummarayStatistics(){
-		return "trainingDataSizeInWords, testingDataSizeInWords, trainingDataSizeInSentences, testingDataSizeInSentences, numberOfTaggedSentencesNotNeutral, totalCorrectSentences, totalNeutralSentences, totalCorrectWords, percentageOfUnknownWords, percentageTrainedOn, totalCorrectPercentage";
+		return "trainingDataSizeInWords, testingDataSizeInWords, trainingDataSizeInSentences, testingDataSizeInSentences, numberOfTaggedSentencesNotNeutral, totalCorrectSentences, totalNeutralSentences, totalCorrectWords, percentageOfUnknownWords, percentageTrainedOn, totalCorrectPercentage, sizeOfObservationLikelihoodTable, sizeOfObservationLikelihoodTableExtended";
 	}
 	public void printToConsole(){
 		System.out.println("trainingDataSizeInWords: " + trainingDataSizeInWords);
@@ -63,6 +69,8 @@ public class HMM_Statistics {
 		System.out.println("percentageOfUnknownWords: " + percentageOfUnknownWords);
 		System.out.println("percentageTrainedOn: " + percentageTrainedOn);
 		System.out.println("totalCorrectPercentage: " + totalCorrectPercentage);
+		System.out.println("sizeOfObservationLikelihoodTable: " + sizeOfObservationLikelihoodTable);
+		System.out.println("sizeOfObservationLikelihoodTableExtended: " + sizeOfObservationLikelihoodTableExtended);
 	}
 	
 	public String contingencyTableString(){
@@ -155,5 +163,16 @@ public class HMM_Statistics {
 	public void setOrder(ArrayList<EmotionOfSentenceTag> order) {
 		this.order = order;
 	}
-	
+	public int getSizeOfObservationLikelihoodTable() {
+		return sizeOfObservationLikelihoodTable;
+	}
+	public void setSizeOfObservationLikelihoodTable(int sizeOfObservationLikelihoodTable) {
+		this.sizeOfObservationLikelihoodTable = sizeOfObservationLikelihoodTable;
+	}
+	public int getSizeOfObservationLikelihoodTableExtended() {
+		return sizeOfObservationLikelihoodTableExtended;
+	}
+	public void setSizeOfObservationLikelihoodTableExtended(int sizeOfObservationLikelihoodTableExtended) {
+		this.sizeOfObservationLikelihoodTableExtended = sizeOfObservationLikelihoodTableExtended;
+	}
 }
