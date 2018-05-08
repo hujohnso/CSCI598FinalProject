@@ -47,7 +47,13 @@ public class SynonymsExtendedHMM extends HMM {
 					System.out.println("We are " + ((double) i / (double) trainingWordsSize) * 100 + "% done");
 				}
 				i++;
-				if(observationLikelihoodTable.contains(w.getWord())){
+				Boolean wordIsPresent = false;
+				for(ObservationLikelihoodTableEntry o: observationLikelihoodTable){
+					if(o.getWord().equals(w.getWord())){
+						wordIsPresent = true;
+					}
+				}
+				if(wordIsPresent){
 					incrementPresentObservationLikelihoodTable(w.getWord(),w.getEmoodTag());
 				}
 				else{
@@ -84,7 +90,7 @@ public class SynonymsExtendedHMM extends HMM {
 
 	@Override
 	protected ArrayList<ArrayList<Word>> tagTestingSet() {
-		addSynonymsToObservationLikelihoodTable();
+		//addSynonymsToObservationLikelihoodTable();
 		Boolean writeObservationLikelihoodTable = true;
 		WriteOutAndReadIn storedTable = new WriteOutAndReadIn();
 		if(writeObservationLikelihoodTable){

@@ -290,6 +290,11 @@ public abstract class HMM {
 	public void readInObservationLikelihoodMap(String observationLikelihoodProbabilitiesFile){
 		WriteOutAndReadIn read = new WriteOutAndReadIn();
 		observationLikelihoodTable = read.deserialize(observationLikelihoodProbabilitiesFile);
+		for(ObservationLikelihoodTableEntry x: observationLikelihoodTable){
+			if(x.getEmmoodProbabilities().get(EmotionOfSentenceTag.FEERFUL) > .75){
+				System.out.println(x.getWord() + " " + x.getEmmoodProbabilities().get(EmotionOfSentenceTag.FEERFUL));
+			}
+		}
 	}
 	public void readInInitialStateProbabilitiesTable(String initialStateProbabilitiesFile){
 		WriteOutAndReadIn read = new WriteOutAndReadIn();

@@ -31,11 +31,17 @@ public class FirstTryHMM extends HMM {
 					System.out.println("We are " + ((double) i / (double) trainingWordsSize) * 100 + "% done");
 				}
 				i++;
-				if(observationLikelihoodTable.contains(w.getWord())){
+				Boolean wordIsPresent = false;
+				for(ObservationLikelihoodTableEntry o: observationLikelihoodTable){
+					if(o.getWord().equals(w.getWord())){
+						wordIsPresent = true;
+					}
+				}
+				if(wordIsPresent){
 					incrementPresentObservationLikelihoodTable(w.getWord(),w.getEmoodTag());
 				}
 				else{
-					ObservationLikelihoodTableEntry olt = new ObservationLikelihoodTableEntry(order,w.getWord());
+					ObservationLikelihoodTableEntry olt = new ObservationLikelihoodTableEntry(order,w);
 					olt.incrementEmmoodCount(w.getEmoodTag());
 					observationLikelihoodTable.add(olt);
 				}

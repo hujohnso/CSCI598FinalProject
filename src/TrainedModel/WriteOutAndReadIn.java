@@ -29,6 +29,8 @@ public class WriteOutAndReadIn {
 		}catch(Exception e){
 			System.out.println(e.getMessage());
 			e.getCause();
+			System.out.println(e.getCause());
+			System.out.println(e.getStackTrace().toString());
 		}
 	}
 	public ArrayList<ObservationLikelihoodTableEntry> deserialize(String fileName){
