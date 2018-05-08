@@ -83,7 +83,7 @@ public abstract class HMM {
 		order.add(EmotionOfSentenceTag.ANGRY);
 		order.add(EmotionOfSentenceTag.SUPPRIZED_PLUS);
 		order.add(EmotionOfSentenceTag.SUPRIZED_NEG);
-		order.add(EmotionOfSentenceTag.FEERFUL);
+		order.add(EmotionOfSentenceTag.FEARFUL);
 		order.add(EmotionOfSentenceTag.SAD);
 		order.add(EmotionOfSentenceTag.DISGUSTED);
 		order.add(EmotionOfSentenceTag.NEUTRAL);
@@ -197,18 +197,18 @@ public abstract class HMM {
 			EmotionOfSentenceTag domEmotion = null;
 			int currentHighestCount = -1;
 			for(EmotionOfSentenceTag e: order){
-				if(emmoodCounts.get(e) > currentHighestCount){
-					currentHighestCount = emmoodCounts.get(e);
-					domEmotion = e;
-				}
-				//				if(emmoodCounts.get(e) > 3 && !e.equals(EmotionOfSentenceTag.NEUTRAL)){
-				//					if(domEmotion != null){
-				//						domEmotion = emmoodCounts.get(e) > emmoodCounts.get(domEmotion) ? e:domEmotion;
-				//					}
-				//					else{
-				//						domEmotion = e;
-				//					}
+				//				if(emmoodCounts.get(e) > currentHighestCount){
+				//					currentHighestCount = emmoodCounts.get(e);
+				//					domEmotion = e;
 				//				}
+				if(emmoodCounts.get(e) >= 2 && !e.equals(EmotionOfSentenceTag.NEUTRAL)){
+					if(domEmotion != null){
+						domEmotion = emmoodCounts.get(e) > emmoodCounts.get(domEmotion) ? e:domEmotion;
+					}
+					else{
+						domEmotion = e;
+					}
+				}
 			}
 			if(domEmotion == null){
 				domEmotion = EmotionOfSentenceTag.NEUTRAL;
@@ -291,8 +291,8 @@ public abstract class HMM {
 		WriteOutAndReadIn read = new WriteOutAndReadIn();
 		observationLikelihoodTable = read.deserialize(observationLikelihoodProbabilitiesFile);
 		for(ObservationLikelihoodTableEntry x: observationLikelihoodTable){
-			if(x.getEmmoodProbabilities().get(EmotionOfSentenceTag.FEERFUL) > .75){
-				System.out.println(x.getWord() + " " + x.getEmmoodProbabilities().get(EmotionOfSentenceTag.FEERFUL));
+			if(x.getEmmoodProbabilities().get(EmotionOfSentenceTag.FEARFUL) > .75){
+				System.out.println(x.getWord() + " " + x.getEmmoodProbabilities().get(EmotionOfSentenceTag.FEARFUL));
 			}
 		}
 	}

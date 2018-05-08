@@ -9,7 +9,7 @@ public enum EmotionOfSentenceTag implements Serializable {
 	HAPPY("H",7,EmotionOfSentenceTag.POSITIVE),
 	SUPPRIZED_PLUS("Su+",1,EmotionOfSentenceTag.POSITIVE),
 	SUPRIZED_NEG("Su-",2,EmotionOfSentenceTag.NEGATIVE),
-	FEERFUL("F",3,EmotionOfSentenceTag.NEGATIVE),
+	FEARFUL("F",3,EmotionOfSentenceTag.NEGATIVE),
 	SAD("S",4,EmotionOfSentenceTag.NEGATIVE),
 	ANGRY("A", 0,EmotionOfSentenceTag.NEGATIVE),
 	DISGUSTED("D",5,EmotionOfSentenceTag.NEGATIVE);

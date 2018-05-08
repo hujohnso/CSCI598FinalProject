@@ -25,20 +25,20 @@ public class Main {
 //		writer.close();
 //	}
 	//
-//		public static void main(String [] args) throws IOException{
-//			MoodData moodData = new MoodData();
-//			BufferedWriter writer = new BufferedWriter(new FileWriter(fileToWriteTo + "deleteMe.txt"));
-//			SynonymsExtendedHMM hmm = new SynonymsExtendedHMM(moodData.getFilteredSentences(),1.0);
-//			writer.write(hmm.stats.makeHeaderForSummarayStatistics() + "\n");
-//			writer.write(hmm.stats.makeSummaryStatisticsStringForCSV() + "\n");
-//			writer.write(hmm.stats.contingencyTableString());
-//			hmm.stats.printToConsole();
-//			writer.close();
-//		}
 		public static void main(String [] args) throws IOException{
-			SynonymsExtendedHMM hmm = new SynonymsExtendedHMM();
-			System.out.println("Sentence: I ");
-			System.out.println("The mood of that sentence is: " + hmm.getMoodFromString("honestly her smile creeps me out"));
+			MoodData moodData = new MoodData();
+			BufferedWriter writer = new BufferedWriter(new FileWriter(fileToWriteTo + "deleteMe.txt"));
+			SynonymsExtendedHMM hmm = new SynonymsExtendedHMM(moodData.getFilteredSentences(),1.0);
+			writer.write(hmm.stats.makeHeaderForSummarayStatistics() + "\n");
+			writer.write(hmm.stats.makeSummaryStatisticsStringForCSV() + "\n");
+			writer.write(hmm.stats.contingencyTableString());
+			hmm.stats.printToConsole();
+			writer.close();
 		}
+//		public static void main(String [] args) throws IOException{
+//			SynonymsExtendedHMM hmm = new SynonymsExtendedHMM();
+//			System.out.println("Sentence: I ");
+//			System.out.println("The mood of that sentence is: " + hmm.getMoodFromString("kismet's venomous smile makes me terrified and uneasy"));
+//		}
 
 }
